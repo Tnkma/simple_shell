@@ -10,7 +10,7 @@
  * Return: Always 0 for success
  */
 
-int built_cmd(char **args, char **envp, int *status_for_exit, int count)
+int built_cmd(char **args, char **envp, int *status_for_exit)
 {
 
 	char *command = args[0];
@@ -37,7 +37,7 @@ int built_cmd(char **args, char **envp, int *status_for_exit, int count)
 	}
 	else if (_strcmp(command, "exit") == 0)
 	{
-		d_exit(args, status_for_exit, args[0], count);
+		d_exit(args);
 	}
 	else if (_strcmp(command, "env") == 0)
 	{

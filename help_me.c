@@ -109,22 +109,15 @@ void unset_env_var(char **args)
  * Return: void since were void
  */
 
-void d_exit(char **args, int *status, char *p_name, int count)
+void d_exit(char **args)
 {
-	int store_inputted_num;
+	int store_inputted_num = EXIT_FAILURE;
 
 	if (args[1])
 	{
 		store_inputted_num = _atoi(args[1]);
-
-		if (store_inputted_num < 0 || store_inputted_num > 255)
-		{
-			print_exit_error(p_name, count, store_inputted_num);
-			return;
-		}
-		*status = store_inputted_num;
 	}
-	exit(*status);
+	exit(store_inputted_num);
 }
 /**
  * _env - prints out the env command

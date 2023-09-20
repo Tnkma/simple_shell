@@ -88,7 +88,7 @@ int handle_cmd_sep(char *lineptr, char **envp, char *p_name, int c, int *exit)
 	args[i] = NULL;
 	if (i > 0)
 	{
-		if (built_cmd(args, envp, exit, c))
+		if (built_cmd(args, envp, exit))
 		{
 			free(cmd);
 			return (*exit); }
