@@ -34,7 +34,7 @@ int execute_log_command(char *command, char **env)
 }
 
 /**
- * logical_op - executes && commands
+ * logical_AND_ops - executes && commands
  * @lineptr: the arguent from command_line
  * @env: enviromental avriable
  *
@@ -86,8 +86,8 @@ int logical_op(char *lineptr, char **env)
 }
 
 /**
- * logical_or - executes && commands
- * @lineptr: the arguent from command_line
+ * logical_OR_ops - executes || commands
+ * @lineptr: the argument from command_line
  * @env: env variable
  *
  *

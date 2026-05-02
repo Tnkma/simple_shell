@@ -75,6 +75,6 @@ int redirection_(char *a[], char type_red[], char *b[], char **env);
 int pipes_redirection(char *argv[], int argc, char **env);
 CmdArgs split_line(char *line);
 void handle_pipe_commands(char *lineptr, char **envp);
-size_t command_exists(char *command);
+int command_exists(char *command);
 
 #endif

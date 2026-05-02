@@ -30,7 +30,7 @@ void read_input(char **argv, char **envp)
 }
 /**
  * fix_newline - fixes the new line on the string
- * @str: the string to trim the newline
+ * @str: the string that needs to be trim the newline
  *
  * Return: the trimed string
  */

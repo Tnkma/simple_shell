@@ -9,46 +9,79 @@
 
 void change_directory(char **args)
 {
-	char *n_dir = getcwd(NULL, 0), *oldpwd = getenv("OLDPWD");
-	char *directory = args[1], *old_dir = getcwd(NULL, 0);
+	char *old_dir = getcwd(NULL, 0);
+	char *new_dir;
+	char *directory = args[1];
+	char *home = getenv("HOME");
+	char *oldpwd = getenv("OLDPWD");
 
-	if (!directory)
+	if (!old_dir)
 	{
-		if (chdir(getenv("HOME")) != 0)
+		perror("getcwd");
+		return;
+	}
+
+	/* Handle: cd or cd ~ */
+	if (!directory || _strcmp(directory, "~") == 0)
+	{
+		if (!home)
+		{
+			_print("cd: HOME not set\n");
+			free(old_dir);
+			return;
+		}
+		if (chdir(home) != 0)
 		{
 			perror("cd");
 			free(old_dir);
-			return; }
+			return;
+		}
 	}
+
+	/* Handle: cd - */
 	else if (_strcmp(directory, "-") == 0)
 	{
-		if (oldpwd)
-		{
-			if (chdir(oldpwd) != 0)
-			{
-				perror("cd");
-				free(old_dir);
-				return; }
-			_print(oldpwd);
-			_print("\n"); }
-		else
+		if (!oldpwd)
 		{
 			_print("cd: OLDPWD not set\n");
 			free(old_dir);
-			return; }
+			return;
+		}
+		if (chdir(oldpwd) != 0)
+		{
+			perror("cd");
+			free(old_dir);
+			return;
+		}
+		_print(oldpwd);
+		_print("\n");
 	}
+
+	/* Handle normal directory (including .. automatically) */
 	else
 	{
 		if (chdir(directory) != 0)
 		{
 			perror("cd");
 			free(old_dir);
-			return; }
+			return;
+		}
 	}
-	setenv("PWD", n_dir, 1);
+
+	/* Get new directory AFTER chdir */
+	new_dir = getcwd(NULL, 0);
+	if (!new_dir)
+	{
+		perror("getcwd");
+		free(old_dir);
+		return;
+	}
+
 	setenv("OLDPWD", old_dir, 1);
+	setenv("PWD", new_dir, 1);
+
 	free(old_dir);
-	free(n_dir);
+	free(new_dir);
 }
 
 
@@ -63,12 +96,12 @@ void set_env_var(char **args)
 {
 	if (!args[1] || !args[2])
 	{
-		_print("Usage set to setenv VAR_NAME VALUE");
+		_print("Usage: setenv VAR_NAME VALUE");
 		return;
 	}
 	if (args[3])
 	{
-		_print("Eror: many argument");
+		_print("Error: too many arguments. Usage: setenv VAR_NAME VALUE");
 		return;
 	}
 	if (setenv(args[1], args[2], 1) != 0)
@@ -87,12 +120,12 @@ void unset_env_var(char **args)
 {
 	if (!args[1])
 	{
-		_print("Error: usuage unsetenv VAR_NAME\n");
+		_print("Error: usage unsetenv VAR_NAME\n");
 		return;
 	}
 	if (args[2])
 	{
-		_print("Error: Too many argument. Usage: unsetenv VAR_NAME\n");
+		_print("Error: Too many arguments. Usage: unsetenv VAR_NAME\n");
 	}
 	if (unsetenv(args[1]) != 0)
 	{
