@@ -57,7 +57,7 @@ void change_directory(char **args)
 		_print("\n");
 	}
 
-	/* Handle normal directory (including .. automatically) */
+	/* Handle normal directory */
 	else
 	{
 		if (chdir(directory) != 0)

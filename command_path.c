@@ -1,7 +1,7 @@
 #include "main.h"
 
 /**
- * loc - locate the path
+ * loc - locate the path of the command
  * @path: the direction of the string
  * @arg: the argument
  * @args: still the arguments
@@ -46,7 +46,7 @@ char *loc(char *path, char *arg, char **args, char **env)
 }
 
 /**
- * get_loc - calls out the path
+ * get_loc - calls out the path of the command
  * @arg: the argument to find the path
  * @args: the argument
  * @env: the env

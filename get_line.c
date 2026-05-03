@@ -148,7 +148,7 @@ void rem_quotes(char *str)
 {
 	int len;
 
-	len = _strlen(str);
+	len = strlen(str);
 
 	if (len >= 2 && str[0] == '"' && str[len - 1] == '"')
 	{

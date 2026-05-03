@@ -63,18 +63,29 @@ char *_strcat(char *dest, char *src);
 int _strcmp(char *s1, char *s2);
 int _atoi(char *s);
 char *_strchr(char *s, char c);
+void rem_quotes(char *str);
+int command_exists(char *command);
+void welcome_msg(void);
+void prompt(void);
+CmdArgs split_line(char *line);
 
 
 
 void handle_cmd_b4pipe(int write_fd, char *cmd, char **envp);
 void exec_cmd4_pipe(int inputed_fd, char *cmd, char **envp);
 void exec_pipe_cmd(char *cmd, char **envp);
-void rem_quotes(char *str);
-int pipes_(char *a[], char *b[], char **env);
-int redirection_(char *a[], char type_red[], char *b[], char **env);
+
+
+
+int pipe_execute(char **cmd1, char **cmd2, char **env);
+
+int redirection_execute(char **cmd, char *file, int type, char **env);
 int pipes_redirection(char *argv[], int argc, char **env);
-CmdArgs split_line(char *line);
+
 void handle_pipe_commands(char *lineptr, char **envp);
-int command_exists(char *command);
+
+
+
+
 
 #endif

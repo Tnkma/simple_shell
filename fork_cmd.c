@@ -47,7 +47,7 @@ int fork_cmd(char **args, char **env, char *p_name, int cmd_count)
 }
 
 /**
- * handle_cmd_sep - handles command separation
+ * handle_cmd_sep - handles command separation and executions of the command
  * @lineptr: the pointer to the arguments
  * @envp: the environmental varible
  * @p_name: the progam name to print error
@@ -75,13 +75,20 @@ int handle_cmd_sep(char *lineptr, char **envp, char *p_name, int c, int *exit)
 		logical_co(lineptr, envp);
 		return (*exit);
 	}
+	else if (strchr(lineptr, '|') || strchr(lineptr, '>') || strchr(lineptr, '<'))
+	{
+		handle_pipe_commands(lineptr, envp);
+		return (*exit);
+	}
+
 	cmd = _strdup(lineptr);
 	token = _strtok(cmd, delim);
 	while (token && i < 100)
 	{
 		if (token[0] == '#')
 		{
-			break; }
+			break;
+		}
 		rem_quotes(token);
 		args[i++] = (token);
 		token = _strtok(NULL, delim); }
