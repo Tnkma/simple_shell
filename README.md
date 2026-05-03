@@ -14,9 +14,9 @@ A small Unix shell implementation in C. This project provides a lightweight comm
   - `env` — print the current environment
   - `exit [status]` — exit the shell with optional status code
 - Special environment-like tokens supported by builtins:
-  - `$?` — print exit status of the last command
-  - `$$` — print the shell process ID
-  - `$PATH` — print the current `PATH`
+  - `echo $?` — print exit status of the last command
+  - `echo $$` — print the shell process ID
+  - `echo $PATH` — print the current `PATH`
 - Shell operators and separators:
   - `&&` — run next command only if previous succeeds
   - `||` — run next command only if previous fails
