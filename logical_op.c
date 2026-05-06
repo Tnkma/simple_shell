@@ -104,6 +104,12 @@ int logical_op(char *lineptr, char **env)
 		/* builtin */
 		if (built_cmd(args, env, &exit_status))
 		{
+			if (exit_status != 0)
+			{
+				free_em(token, cmd_count);
+				mem = 1;
+				break;
+			}
 			continue;
 		}
 
