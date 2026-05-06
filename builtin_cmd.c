@@ -14,6 +14,7 @@ int built_cmd(char **args, char **envp, int *status_for_exit)
 {
 
 	char *command = args[0];
+	int return_value;
 
 	if (_getppid(args, status_for_exit))
 	{
@@ -21,7 +22,17 @@ int built_cmd(char **args, char **envp, int *status_for_exit)
 	}
 	if (_strcmp(command, "cd") == 0)
 	{
-		change_directory(args);
+		return_value = change_directory(args);
+		printf("return value: %d\n", return_value);
+		if (return_value == 0)
+		{
+			*status_for_exit = 0;
+
+		}
+		else
+		{
+			*status_for_exit = 1;
+		}
 		return (1);
 	}
 

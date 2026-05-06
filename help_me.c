@@ -7,7 +7,7 @@
  * Return: void since were void
  */
 
-void change_directory(char **args)
+int change_directory(char **args)
 {
 	char *old_dir = getcwd(NULL, 0);
 	char *new_dir;
@@ -18,7 +18,7 @@ void change_directory(char **args)
 	if (!old_dir)
 	{
 		perror("getcwd");
-		return;
+		return (1);
 	}
 
 	/* Handle: cd or cd ~ */
@@ -28,13 +28,13 @@ void change_directory(char **args)
 		{
 			_print("cd: HOME not set\n");
 			free(old_dir);
-			return;
+			return (1);
 		}
 		if (chdir(home) != 0)
 		{
 			perror("cd");
 			free(old_dir);
-			return;
+			return (1);
 		}
 	}
 
@@ -45,13 +45,13 @@ void change_directory(char **args)
 		{
 			_print("cd: OLDPWD not set\n");
 			free(old_dir);
-			return;
+			return (1);
 		}
 		if (chdir(oldpwd) != 0)
 		{
 			perror("cd");
 			free(old_dir);
-			return;
+			return (1);
 		}
 		_print(oldpwd);
 		_print("\n");
@@ -64,7 +64,7 @@ void change_directory(char **args)
 		{
 			perror("cd");
 			free(old_dir);
-			return;
+			return (1);
 		}
 	}
 
@@ -74,7 +74,7 @@ void change_directory(char **args)
 	{
 		perror("getcwd");
 		free(old_dir);
-		return;
+		return (1);
 	}
 
 	setenv("OLDPWD", old_dir, 1);
@@ -82,6 +82,8 @@ void change_directory(char **args)
 
 	free(old_dir);
 	free(new_dir);
+
+	return (0);
 }
 
 

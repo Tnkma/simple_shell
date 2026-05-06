@@ -48,7 +48,7 @@ int get_loc(char *arg, char **args, char **env);
 char *loc(char *path, char *arg, char **args, char **env);
 char *_strdup(const char *s);
 int built_cmd(char **arg, char **envp, int *status_for_exit);
-void change_directory(char **args);
+int change_directory(char **args);
 void set_env_var(char **args);
 void unset_env_var(char **args);
 void d_exit(char **args);

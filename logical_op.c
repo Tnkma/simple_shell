@@ -62,9 +62,35 @@ int logical_op(char *lineptr, char **env)
 		current_command = token[i];
 		status = 0;
 
-		/* split current command into args */
+		/* check for pipe or redirection BEFORE splitting */
+		if (strchr(current_command, '|') || strchr(current_command, '>') || strchr(current_command, '<'))
+		{
+			j = 0;
+			tok = _strtok(current_command, " \t\n");
+
+			while (tok && j < 100)
+			{
+				args[j++] = tok;
+				tok = _strtok(NULL, " \t\n");
+			}
+			args[j] = NULL;
+
+			exit_status = pipes_redirection(args, j, env);
+
+			/* stop if failed */
+			if (exit_status != 0)
+			{
+				free_em(token, cmd_count);
+				mem = 1;
+				break;
+			}
+			continue;
+		}
+
+		/* NORMAL COMMAND PATH */
 		j = 0;
 		tok = _strtok(current_command, " \t\n");
+
 		while (tok && j < 100)
 		{
 			args[j++] = tok;
@@ -75,42 +101,39 @@ int logical_op(char *lineptr, char **env)
 		if (args[0] == NULL)
 			continue;
 
-		/* check built-in */
+		/* builtin */
 		if (built_cmd(args, env, &exit_status))
 		{
-			/* builtin already executed */
+			continue;
+		}
+
+		/* external command */
+		chpro = fork();
+		if (chpro == 0)
+		{
+			if (get_loc(args[0], args, env) == -1)
+				exit(EXIT_FAILURE);
+		}
+		else if (chpro > 0)
+		{
+			wait(&status);
+			if (WIFEXITED(status))
+			{
+				exit_status = wait_status(status);
+
+				if (exit_status != 0)
+				{
+					free_em(token, cmd_count);
+					mem = 1;
+					break;
+				}
+			}
 		}
 		else
 		{
-			chpro = fork();
-			if (chpro == 0)
-			{
-				/* execute external command */
-				if (get_loc(args[0], args, env) == -1)
-					exit(EXIT_FAILURE);
-			}
-			else if (chpro > 0)
-			{
-				wait(&status);
-				if (WIFEXITED(status))
-				{
-					exit_status = wait_status(status);
-
-					/* stop if command failed */
-					if (exit_status != 0)
-					{
-						free_em(token, cmd_count);
-						mem = 1;
-						break;
-					}
-				}
-			}
-			else
-			{
-				perror("fork");
-				free_em(token, cmd_count);
-				return (1);
-			}
+			perror("fork");
+			free_em(token, cmd_count);
+			return (1);
 		}
 	}
 
@@ -143,15 +166,41 @@ int logical_or(char *lineptr, char **env)
 		command = _strtok(NULL, "||");
 	}
 	token[cmd_count] = NULL;
-
 	for (i = 0; i < cmd_count; i++)
 	{
 		current_command = token[i];
 		status = 0;
+		/* check for pipe or redirection BEFORE splitting */
+		if (strchr(current_command, '|') ||
+			strchr(current_command, '>') ||
+			strchr(current_command, '<'))
+		{
+			j = 0;
+			tok = _strtok(current_command, " \t\n");
 
-		/* split current command into args */
+			while (tok && j < 100)
+			{
+				args[j++] = tok;
+				tok = _strtok(NULL, " \t\n");
+			}
+			args[j] = NULL;
+
+			exit_status = pipes_redirection(args, j, env);
+
+			/* stop if failed */
+			if (exit_status != 0)
+			{
+				free_em(token, cmd_count);
+				mem = 1;
+				break;
+			}
+			continue;
+		}
+
+		/* NORMAL COMMAND PATH */
 		j = 0;
 		tok = _strtok(current_command, " \t\n");
+
 		while (tok && j < 100)
 		{
 			args[j++] = tok;
@@ -162,42 +211,39 @@ int logical_or(char *lineptr, char **env)
 		if (args[0] == NULL)
 			continue;
 
-		/* check built-in */
+		/* builtin */
 		if (built_cmd(args, env, &exit_status))
 		{
-			/* builtin already executed */
+			continue;
+		}
+
+		/* external command */
+		chpro = fork();
+		if (chpro == 0)
+		{
+			if (get_loc(args[0], args, env) == -1)
+				exit(EXIT_FAILURE);
+		}
+		else if (chpro > 0)
+		{
+			wait(&status);
+			if (WIFEXITED(status))
+			{
+				exit_status = wait_status(status);
+
+				if (exit_status != 0)
+				{
+					free_em(token, cmd_count);
+					mem = 1;
+					break;
+				}
+			}
 		}
 		else
 		{
-			chpro = fork();
-			if (chpro == 0)
-			{
-				/* execute external command */
-				if (get_loc(args[0], args, env) == -1)
-					exit(EXIT_FAILURE);
-			}
-			else if (chpro > 0)
-			{
-				wait(&status);
-				if (WIFEXITED(status))
-				{
-					exit_status = wait_status(status);
-
-					/* stop if command failed */
-					if (exit_status != 0)
-					{
-						free_em(token, cmd_count);
-						mem = 1;
-						break;
-					}
-				}
-			}
-			else
-			{
-				perror("fork");
-				free_em(token, cmd_count);
-				return (1);
-			}
+			perror("fork");
+			free_em(token, cmd_count);
+			return (1);
 		}
 	}
 
@@ -209,10 +255,8 @@ int logical_or(char *lineptr, char **env)
 
 /**
  * logical_co - executes ; commands
- * @lineptr: the arguent from command_line
- * @env: env variable
- *
- *
+ * @lineptr: the argument from command_line
+	 * @env: env variable
  * Return: Always 0 for success
  */
 int logical_co(char *lineptr, char **env)
@@ -236,9 +280,37 @@ int logical_co(char *lineptr, char **env)
 		current_command = token[i];
 		status = 0;
 
-		/* split current command into args */
+		/* check for pipe or redirection BEFORE splitting */
+		if (strchr(current_command, '|') ||
+			strchr(current_command, '>') ||
+			strchr(current_command, '<'))
+		{
+			j = 0;
+			tok = _strtok(current_command, " \t\n");
+
+			while (tok && j < 100)
+			{
+				args[j++] = tok;
+				tok = _strtok(NULL, " \t\n");
+			}
+			args[j] = NULL;
+
+			exit_status = pipes_redirection(args, j, env);
+
+			/* stop if failed */
+			if (exit_status != 0)
+			{
+				free_em(token, cmd_count);
+				mem = 1;
+				break;
+			}
+			continue;
+		}
+
+		/* NORMAL COMMAND PATH */
 		j = 0;
 		tok = _strtok(current_command, " \t\n");
+
 		while (tok && j < 100)
 		{
 			args[j++] = tok;
@@ -249,42 +321,39 @@ int logical_co(char *lineptr, char **env)
 		if (args[0] == NULL)
 			continue;
 
-		/* check built-in */
+		/* builtin */
 		if (built_cmd(args, env, &exit_status))
 		{
-			/* builtin already executed */
+			continue;
+		}
+
+		/* external command */
+		chpro = fork();
+		if (chpro == 0)
+		{
+			if (get_loc(args[0], args, env) == -1)
+				exit(EXIT_FAILURE);
+		}
+		else if (chpro > 0)
+		{
+			wait(&status);
+			if (WIFEXITED(status))
+			{
+				exit_status = wait_status(status);
+
+				if (exit_status != 0)
+				{
+					free_em(token, cmd_count);
+					mem = 1;
+					break;
+				}
+			}
 		}
 		else
 		{
-			chpro = fork();
-			if (chpro == 0)
-			{
-				/* execute external command */
-				if (get_loc(args[0], args, env) == -1)
-					exit(EXIT_FAILURE);
-			}
-			else if (chpro > 0)
-			{
-				wait(&status);
-				if (WIFEXITED(status))
-				{
-					exit_status = wait_status(status);
-
-					/* stop if command failed */
-					if (exit_status != 0)
-					{
-						free_em(token, cmd_count);
-						mem = 1;
-						break;
-					}
-				}
-			}
-			else
-			{
-				perror("fork");
-				free_em(token, cmd_count);
-				return (1);
-			}
+			perror("fork");
+			free_em(token, cmd_count);
+			return (1);
 		}
 	}
 
