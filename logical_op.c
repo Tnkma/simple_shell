@@ -171,9 +171,7 @@ int logical_or(char *lineptr, char **env)
 		current_command = token[i];
 		status = 0;
 		/* check for pipe or redirection BEFORE splitting */
-		if (strchr(current_command, '|') ||
-			strchr(current_command, '>') ||
-			strchr(current_command, '<'))
+		if (strchr(current_command, '|') || strchr(current_command, '>') || strchr(current_command, '<'))
 		{
 			j = 0;
 			tok = _strtok(current_command, " \t\n");
@@ -188,7 +186,7 @@ int logical_or(char *lineptr, char **env)
 			exit_status = pipes_redirection(args, j, env);
 
 			/* stop if failed */
-			if (exit_status != 0)
+			if (exit_status == 0)
 			{
 				free_em(token, cmd_count);
 				mem = 1;
@@ -214,9 +212,13 @@ int logical_or(char *lineptr, char **env)
 		/* builtin */
 		if (built_cmd(args, env, &exit_status))
 		{
-			continue;
+			if (exit_status == 0)
+			{
+				free_em(token, cmd_count);
+				mem = 1;
+				break;
+			}
 		}
-
 		/* external command */
 		chpro = fork();
 		if (chpro == 0)
@@ -231,7 +233,7 @@ int logical_or(char *lineptr, char **env)
 			{
 				exit_status = wait_status(status);
 
-				if (exit_status != 0)
+				if (exit_status == 0)
 				{
 					free_em(token, cmd_count);
 					mem = 1;
@@ -298,12 +300,6 @@ int logical_co(char *lineptr, char **env)
 			exit_status = pipes_redirection(args, j, env);
 
 			/* stop if failed */
-			if (exit_status != 0)
-			{
-				free_em(token, cmd_count);
-				mem = 1;
-				break;
-			}
 			continue;
 		}
 
@@ -341,12 +337,6 @@ int logical_co(char *lineptr, char **env)
 			{
 				exit_status = wait_status(status);
 
-				if (exit_status != 0)
-				{
-					free_em(token, cmd_count);
-					mem = 1;
-					break;
-				}
 			}
 		}
 		else

@@ -12,52 +12,37 @@
 
 int built_cmd(char **args, char **envp, int *status_for_exit)
 {
+    char *command = args[0];
 
-	char *command = args[0];
-	int return_value;
+    if (_getppid(args, status_for_exit))
+        return (1);
 
-	if (_getppid(args, status_for_exit))
-	{
-		return (1);
-	}
-	if (_strcmp(command, "cd") == 0)
-	{
-		return_value = change_directory(args);
-		printf("return value: %d\n", return_value);
-		if (return_value == 0)
-		{
-			*status_for_exit = 0;
-
-		}
-		else
-		{
-			*status_for_exit = 1;
-		}
-		return (1);
-	}
-
-	else if (_strcmp(command, "setenv") == 0)
-	{
-		set_env_var(args);
-		return (1);
-	}
-	else if (_strcmp(command, "unsetenv") == 0)
-	{
-		unset_env_var(args);
-		return (1);
-	}
-	else if (_strcmp(command, "exit") == 0)
-	{
-		d_exit(args);
-	}
-	else if (_strcmp(command, "env") == 0)
-	{
-		_env(envp);
-		return (1);
-	}
-
-
-	return (*status_for_exit);
+    if (_strcmp(command, "cd") == 0)
+    {
+        *status_for_exit = change_directory(args);
+        return (1);
+    }
+    else if (_strcmp(command, "setenv") == 0)
+    {
+        *status_for_exit = set_env_var(args);
+        return (1);
+    }
+    else if (_strcmp(command, "unsetenv") == 0)
+    {
+        *status_for_exit = unset_env_var(args);
+        return (1);
+    }
+    else if (_strcmp(command, "env") == 0)
+    {
+        _env(envp);
+        *status_for_exit = 0;
+        return (1);
+    }
+    else if (_strcmp(command, "exit") == 0)
+    {
+        d_exit(args);
+    }
+    return (*status_for_exit);
 }
 
 /**

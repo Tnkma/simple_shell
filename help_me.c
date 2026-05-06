@@ -94,22 +94,24 @@ int change_directory(char **args)
  * Return: void since were void
  */
 
-void set_env_var(char **args)
+int set_env_var(char **args)
 {
 	if (!args[1] || !args[2])
 	{
 		_print("Usage: setenv VAR_NAME VALUE");
-		return;
+		return (1);
 	}
 	if (args[3])
 	{
 		_print("Error: too many arguments. Usage: setenv VAR_NAME VALUE");
-		return;
+		return (1);
 	}
 	if (setenv(args[1], args[2], 1) != 0)
 	{
 		perror("setenv");
+		return (1);
 	}
+	return (0);
 }
 /**
  * unset_env_var - unset the enviromental varible
@@ -118,21 +120,24 @@ void set_env_var(char **args)
  * Return: void since were void
  */
 
-void unset_env_var(char **args)
+int unset_env_var(char **args)
 {
 	if (!args[1])
 	{
 		_print("Error: usage unsetenv VAR_NAME\n");
-		return;
+		return (1);
 	}
 	if (args[2])
 	{
 		_print("Error: Too many arguments. Usage: unsetenv VAR_NAME\n");
+		return (1);
 	}
 	if (unsetenv(args[1]) != 0)
 	{
 		perror("Error unsetting enviroment variable");
+		return (1);
 	}
+	return (0);
 }
 /**
  * d_exit - the exit function
