@@ -1,4 +1,4 @@
-#include "main.h"
+#include "utils.h"
 
 /**
  * _strdup - copies the string and returns the pointer
@@ -40,7 +40,7 @@ char *_strdup(const char *str)
 }
 
 /**
- * _atoi - Entry point
+ * _atoi - converts a string to an integer
  * @s: input
  * Return: Always 0 (Success)
  */
@@ -62,7 +62,7 @@ int _atoi(char *s)
 	} while (*s++);
 	return (num * sign);
 }
-#include "main.h"
+
 
 /**
  * _strchr - finds a certain character and prints from there

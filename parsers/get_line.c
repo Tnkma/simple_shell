@@ -1,4 +1,4 @@
-#include "main.h"
+#include "parser.h"
 
 /**
  * new_line - handles newline character

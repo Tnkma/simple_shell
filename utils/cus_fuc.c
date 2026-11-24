@@ -1,4 +1,4 @@
-#include "main.h"
+#include "utils.h"
 
 /**
  * _strlen - the function to count the string

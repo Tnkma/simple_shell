@@ -1,6 +1,9 @@
 #include "main.h"
 /**
  * prompt - prints the prompt to stdout
+ * CWD is printed to the prompt, if available, otherwise a default prompt is used.
+ * @cwd: current working directory
+ * @base: base name of the current working directory
  *
  *
  * Return: void since were void
@@ -19,12 +22,12 @@ void prompt(void)
 			base = cwd;
 
 		_print(base);
-		_print(" $ ");
+		printf(PROMPT);
 		free(cwd);
 	}
 	else
 	{
-		_print("$ ");
+		printf(PROMPT);
 	}
 
 	fflush(stdout);
@@ -77,7 +80,7 @@ int main(int argc, char **argv, char **envp)
 			lineptr = _getline();
 			if (lineptr == NULL) /*EOF detected*/
 			{
-				_print("\n");
+				printf("\n");
 				free(lineptr);
 				break;
 			}
