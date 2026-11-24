@@ -1,4 +1,5 @@
-# simple_shell
+
+# Simple Shell
 
 A small Unix shell implementation in C. This project provides a lightweight command interpreter that supports interactive and non-interactive modes, built-in shell commands, command separators, pipes, and I/O redirection.
 
