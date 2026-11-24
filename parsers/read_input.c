@@ -1,4 +1,4 @@
-#include "main.h"
+#include "parser.h"
 
 /**
  * read_input - reads input from stdin
@@ -186,7 +186,7 @@ int pipe_execute(char **cmd1, char **cmd2, char **env)
 
 	if (!command_exists(cmd1[0]) || !command_exists(cmd2[0]))
 	{
-		_print("Error: Command not found.\n");
+		fprintf(stderr, "Error: Command not found.\n");
 		return -1;
 	}
 

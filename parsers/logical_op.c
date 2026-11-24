@@ -1,4 +1,4 @@
-#include "main.h"
+#include "parser.h"
 
 /**
  * execute_log_command - execute the logical command assigned from the logical operator functions

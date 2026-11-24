@@ -1,4 +1,4 @@
-#include "main.h"
+#include "executor.h"
 
 /**
  * loc - locate the path of the command
