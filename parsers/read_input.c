@@ -8,10 +8,10 @@
  * Return: void since were void
  */
 
-void read_input(char **argv, char **envp)
+void read_input(char **argv, shellInfo shell)
 {
 	char *lineptr = NULL;
-	int cn = 0, exit_status = 0;
+	int cn = 0;
 
 	while (1)
 	{
@@ -23,11 +23,12 @@ void read_input(char **argv, char **envp)
 		}
 
 		cn++;
-		handle_cmd_sep(lineptr, envp, argv[0], cn, &exit_status);
+		handle_cmd_sep(lineptr, &shell);
 		free(lineptr);
 		lineptr = NULL;
 	}
 }
+
 /**
  * fix_newline - fixes the new line on the string
  * @str: the string that needs to be trim the newline
@@ -69,7 +70,7 @@ char *fix_newline(char *str)
  * Return: void since were void
  */
 
-void handle_pipe_commands(char *lineptr, char **envp)
+void handle_pipe_commands(char *lineptr, shellInfo *shell)
 {
 	char *command_copy, *single_command;
 	char *args[100];
@@ -95,7 +96,7 @@ void handle_pipe_commands(char *lineptr, char **envp)
 		args[i] = NULL;
 
 		if (i > 0)
-			pipes_redirection(args, i, envp);
+			pipes_redirection(args, i, shell);
 
 		single_command = _strtok(NULL, ";");
 	}
@@ -106,11 +107,11 @@ void handle_pipe_commands(char *lineptr, char **envp)
  * pipes_redirection - handles both pipes and redirections
  * @argv: the arguments of the command
  * @argc: the count of the arguments
- * @env: the env variable
+ * @shell: the shell information
  *
  * Return: Always 0 for success
  */
-int pipes_redirection(char *argv[], int argc, char **env)
+int pipes_redirection(char *argv[], int argc, shellInfo *shell)
 {
 	char *command1[100], *command2[100];
 	int i, split = 0;
@@ -146,7 +147,7 @@ int pipes_redirection(char *argv[], int argc, char **env)
 
 	if (flag_pipe)
 	{
-		return pipe_execute(command1, command2, env);
+		return pipe_execute(command1, command2, shell);
 	}
 
 	if (flag_redirection)
@@ -160,7 +161,7 @@ int pipes_redirection(char *argv[], int argc, char **env)
 		else
 			type = 2; /* < */
 
-		return redirection_execute(command1, command2[0], type, env);
+		return redirection_execute(command1, command2[0], type, shell);
 	}
 
 	return -1;
@@ -173,7 +174,7 @@ int pipes_redirection(char *argv[], int argc, char **env)
  *
  * Return: Always 0 for success
  */
-int pipe_execute(char **cmd1, char **cmd2, char **env)
+int pipe_execute(char **cmd1, char **cmd2, shellInfo *shell)
 {
 	int fd[2];
 	pid_t pid1, pid2;
@@ -201,7 +202,8 @@ int pipe_execute(char **cmd1, char **cmd2, char **env)
 
 
 
-		get_loc(cmd1[0], cmd1, env);
+
+		get_loc(cmd1[0], cmd1, shell);
 		perror("execve");
 		exit(EXIT_FAILURE);
 	}
@@ -221,7 +223,7 @@ int pipe_execute(char **cmd1, char **cmd2, char **env)
 		close(fd[1]);
 		close(fd[0]);
 
-		get_loc(cmd2[0], cmd2, env);
+		get_loc(cmd2[0], cmd2, shell);
 		perror("execve");
 		exit(EXIT_FAILURE);
 	}
@@ -245,7 +247,7 @@ int pipe_execute(char **cmd1, char **cmd2, char **env)
  * Return: Always 0 for success
  */
 
-int redirection_execute(char **cmd, char *file, int type, char **env)
+int redirection_execute(char **cmd, char *file, int type, shellInfo *shell)
 {
 	int fd;
 	pid_t pid;
@@ -273,7 +275,7 @@ int redirection_execute(char **cmd, char *file, int type, char **env)
 
 		close(fd);
 
-		get_loc(cmd[0], cmd, env);
+		get_loc(cmd[0], cmd, shell);
 		perror("execve");
 		exit(EXIT_FAILURE);
 	}

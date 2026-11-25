@@ -65,10 +65,17 @@ void welcome_msg(void)
 int main(int argc, char **argv, char **envp)
 {
 	char *lineptr = NULL;
-	int fo_s, cmd_count = 0;
-	int exit_status = 0;
+	int fo_s;
 
+	shellInfo shell;
+
+	shell.envp = envp;
+	shell.program_name = argv[0];
+	shell.cmd_count = 0;
+	shell.exit_status = 0;
 	fo_s = isatty(STDIN_FILENO);
+
+
 	if (fo_s == 1)
 	{
 		welcome_msg();
@@ -86,8 +93,8 @@ int main(int argc, char **argv, char **envp)
 			}
 			else
 			{
-				cmd_count++;
-				handle_cmd_sep(lineptr, envp, argv[0], cmd_count, &exit_status);
+				shell.cmd_count++;
+				handle_cmd_sep(lineptr, &shell);
 			}
 		}
 		lineptr = NULL;
@@ -98,7 +105,7 @@ int main(int argc, char **argv, char **envp)
 	{
 		if (argc < 2)
 		{
-			read_input(argv, envp);
+			read_input(argv, shell);
 		}
 	}
 	return (0);

@@ -22,9 +22,11 @@
  */
 typedef struct
 {
-	char **args;
+	char **args; 
 	int count;
 } CmdArgs;
+
+#include "shell.h"
 
 #define print(c) (write(STDERR_FILENO, c, _strlen(c)))
 

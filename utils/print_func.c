@@ -58,16 +58,15 @@ void print_int(int num)
 /**
  * print_exit_error - prints error code when command does not exit
  * @input: the command searched for
- * @count: the counter for the number
- * @p_name: the ex-program name
+ * @shell: the shell information structure
  *
  * Return: void since were void
  */
-void print_exit_error(char *input, int count, char *p_name)
+void print_exit_error(char *input, shellInfo *shell)
 {
-	_print(p_name);
+	_print(shell->program_name);
 	_print(": ");
-	print_int(count);
+	print_int(shell->cmd_count);
 	_print(":");
 	_print(" ");
 	_print(input);

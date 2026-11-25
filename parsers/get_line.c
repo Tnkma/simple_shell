@@ -4,7 +4,7 @@
  * new_line - handles newline character
  * @str: the string
  *
- * Return: void since were void
+ * Return: the string with newline character removed
  */
 char *new_line(char *str)
 {
@@ -15,7 +15,7 @@ char *new_line(char *str)
  * e_space - handles extra space
  * @str: the inputed strings
  *
- * Return: the function to remove the string
+ * Return: the string with leading spaces removed
  */
 char *e_space(char *str)
 {
@@ -124,6 +124,7 @@ char *_strtok(char *str, const char *delim)
 	end_str = str;
 	while (*end_str && !strchr(delim, *end_str))
 		end_str++;
+	
 	/*null_terminate any delim found*/
 	if (*end_str)
 	{
@@ -141,7 +142,7 @@ char *_strtok(char *str, const char *delim)
  * rem_quotes - removes quotes
  * @str: the input
  *
- * Return: void since were void
+ * Return: removes the quotes from the string
  */
 
 void rem_quotes(char *str)
@@ -150,6 +151,7 @@ void rem_quotes(char *str)
 
 	len = strlen(str);
 
+	/* checks if the string is quoted by checking the first and last characters */
 	if (len >= 2 && str[0] == '"' && str[len - 1] == '"')
 	{
 		memmove(str, str + 1, len - 2);

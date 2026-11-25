@@ -7,7 +7,7 @@
  *
  * Return: Always 0 for success
  */
-int _getppid(char **args, int *status_for_exit)
+int _getppid(char **args, shellInfo *shell)
 {
 	char *path;
 	unsigned int getcurrentid = getpid();
@@ -18,7 +18,7 @@ int _getppid(char **args, int *status_for_exit)
 	}
 	if (strncmp(args[1], "$?", 2) == 0)
 	{
-		printf("%d", *status_for_exit);
+		printf("%d", shell->exit_status);
 		_print("\n");
 		return (1);
 	}

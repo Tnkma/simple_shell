@@ -21,10 +21,11 @@
 #include "../utils/utils.h"
 #include "../parsers/parser.h"
 #include "../executor/executor.h"
+#include "../shell.h"
 
 
 
-int built_cmd(char **args, char **envp, int *status_for_exit);
+int built_cmd(char **args,shellInfo *shell);
 int change_directory(char **args);
 int command_exists(char *command);
 

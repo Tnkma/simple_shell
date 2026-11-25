@@ -16,24 +16,25 @@
 #include "../utils/utils.h"
 #include "../executor/executor.h"
 #include "../cmd/cmd.h"
+#include "../shell.h"
 
 
-void handle_pipe_commands(char *lineptr, char **envp);
+void handle_pipe_commands(char *lineptr, shellInfo *shell);
 char *fix_newline(char *str);
 void rem_quotes(char *str);
-void handle_cmd_b4pipe(int write_fd, char *cmd, char **envp);
-void exec_cmd4_pipe(int inputed_fd, char *cmd, char **envp);
-void exec_pipe_cmd(char *cmd, char **envp);
-int pipe_execute(char **cmd1, char **cmd2, char **env);
-int redirection_execute(char **cmd, char *file, int type, char **env);
-int pipes_redirection(char *argv[], int argc, char **env);
-void read_input(char **argv, char **envp);
+void handle_cmd_b4pipe(int write_fd, char *cmd, shellInfo *shell);
+void exec_cmd4_pipe(int inputed_fd, char *cmd, shellInfo *shell);
+void exec_pipe_cmd(char *cmd, shellInfo *shell);
+int pipe_execute(char **cmd1, char **cmd2, shellInfo *shell);
+int redirection_execute(char **cmd, char *file, int type, shellInfo *shell);
+int pipes_redirection(char *argv[], int argc, shellInfo *shell);
+void read_input(char **argv, shellInfo shell);
 
 
-int logical_op(char *lineptr, char **env);
-int logical_or(char *lineptr, char **env);
-int logical_co(char *lineptr, char **env);
-int execute_log_command(char *command, char **env);
+int logical_op(char *lineptr, shellInfo *shell);
+int logical_or(char *lineptr, shellInfo *shell);
+int logical_co(char *lineptr, shellInfo *shell);
+int execute_log_command(char *command, shellInfo *shell);
 
 char *e_space(char *str);
 char *_strtok(char *str, const char *delim);

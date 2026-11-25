@@ -79,13 +79,13 @@ void d_exit(char **args)
  * Return: void dince were void
  */
 
-void _env(char **envp)
+void _env(shellInfo *shell)
 {
 	int i;
 
-	for (i = 0; envp[i] != NULL; i++)
+	for (i = 0; shell->envp[i] != NULL; i++)
 	{
-		_print(envp[i]);
+		_print(shell->envp[i]);
 		_print("\n");
 	}
 }

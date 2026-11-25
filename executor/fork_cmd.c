@@ -10,10 +10,10 @@
  * Return: void since were void
  */
 
-int fork_cmd(char **args, char **env, char *p_name, int cmd_count)
+int fork_cmd(char **args, shellInfo *shell)
 {
 	pid_t chpro;
-	int status = 0, status_for_exit;
+	int status = 0;
 
 
 	if (command_exists(*args))
@@ -25,7 +25,7 @@ int fork_cmd(char **args, char **env, char *p_name, int cmd_count)
 		}
 		else if (chpro == 0)
 		{
-			get_loc(args[0], args, env);
+			get_loc(args[0], args, shell);
 			perror("failed");
 			exit(EXIT_FAILURE);
 		}
@@ -34,16 +34,16 @@ int fork_cmd(char **args, char **env, char *p_name, int cmd_count)
 			do {
 
 				waitpid(chpro, &status, WUNTRACED);
-				status_for_exit = wait_status(status);
+				shell->exit_status = wait_status(status);
 			} while (!WIFEXITED(status) && !WIFSIGNALED(status));
 		}
 	}
 	else
 	{
-		fprintf(stderr, "%s: %d: %s: not found\n", p_name, cmd_count, args[0]);
-		status_for_exit = 127;
+		fprintf(stderr, "%s: %d: %s: not found\n", shell->program_name, shell->cmd_count, args[0]);
+		shell->exit_status = 127;
 	}
-	return (status_for_exit);
+	return (shell->exit_status);
 }
 
 /**
@@ -57,28 +57,30 @@ int fork_cmd(char **args, char **env, char *p_name, int cmd_count)
  * Return: void since were void.
  */
 
-int handle_cmd_sep(char *lineptr, char **envp, char *p_name, int c, int *exit)
+int handle_cmd_sep(char *lineptr, shellInfo *shell)
 {
 	char *delim = " \n\t\n\a", *args[100], *cmd, *token;
 	int i = 0;
 
 	if (strstr(lineptr, "&&"))
 	{
-		logical_op(lineptr, envp);
-		return (*exit); }
+		logical_op(lineptr, shell);
+		return (shell->exit_status); 
+	}
 	else if (strstr(lineptr, "||"))
 	{
-		logical_or(lineptr, envp);
-		return (*exit); }
+		logical_or(lineptr, shell);
+		return (shell->exit_status);
+	 }
 	else if (strstr(lineptr, ";"))
 	{
-		logical_co(lineptr, envp);
-		return (*exit);
+		logical_co(lineptr, shell);
+		return (shell->exit_status);
 	}
 	else if (strchr(lineptr, '|') || strchr(lineptr, '>') || strchr(lineptr, '<'))
 	{
-		handle_pipe_commands(lineptr, envp);
-		return (*exit);
+		handle_pipe_commands(lineptr, shell);
+		return (shell->exit_status);
 	}
 
 	cmd = _strdup(lineptr);
@@ -95,15 +97,15 @@ int handle_cmd_sep(char *lineptr, char **envp, char *p_name, int c, int *exit)
 	args[i] = NULL;
 	if (i > 0)
 	{
-		if (built_cmd(args, envp, exit))
+		if (built_cmd(args, shell))
 		{
 			free(cmd);
-			return (*exit); }
-		*exit = fork_cmd(args, envp, p_name, c);
+			return (shell->exit_status); }
+		shell->exit_status = fork_cmd(args, shell);
 	}
 	free(cmd);
 	cmd = NULL;
-	return (*exit);
+	return (shell->exit_status);
 }
 /**
  * wait_status - different status for wait

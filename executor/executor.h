@@ -14,21 +14,22 @@
 #include "../utils/utils.h"
 #include "../parsers/parser.h"
 #include "../cmd/cmd.h"
+#include "../shell.h"
 
-int _getppid(char **args, int *status_for_exit);
+int _getppid(char **args, shellInfo *shell);
 int set_env_var(char **args);
 
 int unset_env_var(char **args);
 void d_exit(char **args);
 
-void _env(char **envp);
+void _env(shellInfo *shell);
 int command_exists(char *command);
 
-int get_loc(char *arg, char **args, char **env);
-char *loc(char *path, char *arg, char **args, char **env);
+int get_loc(char *arg, char **args, shellInfo *shell);
+char *loc(char *path, char *arg, char **args, shellInfo *shell);
 
-int fork_cmd(char **args, char **env, char *p_name, int cmd_count);
-int handle_cmd_sep(char *lineptr, char **envp, char *p_name, int c, int *exit);
+int fork_cmd(char **args, shellInfo *shell);
+int handle_cmd_sep(char *lineptr, shellInfo *shell);
 
 int wait_status(int status);
 

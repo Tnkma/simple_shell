@@ -18,7 +18,7 @@
 
 void _print(const char *str);
 void print_int(int num);
-void print_exit_error(char *input, int count, char *p_name);
+void print_exit_error(char *input, shellInfo *shell);
 int print_echo(char **cmd);
 
 
@@ -27,7 +27,7 @@ void print_int(int num);
 
 
 void print_numbers(int n);
-void _print_error(char *input, int count, char *p_name);
+void _print_error(char *input, shellInfo *shell);
 
 
 /* String functions */

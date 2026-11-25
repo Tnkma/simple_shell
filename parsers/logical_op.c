@@ -7,7 +7,7 @@
  *
  * Return: Always 0 for success
  */
-int execute_log_command(char *command, char **env)
+int execute_log_command(char *command, shellInfo *shell)
 {
 	const int MAX_ARGS = 64;
 	char **args = malloc(MAX_ARGS * sizeof(char *));
@@ -23,7 +23,7 @@ int execute_log_command(char *command, char **env)
 	}
 	args[count] = NULL;
 
-	ret_value = get_loc(args[0], args, env);
+	ret_value = get_loc(args[0], args, shell);
 	if (ret_value == -1)
 	{
 		free(args);
@@ -36,28 +36,27 @@ int execute_log_command(char *command, char **env)
 /**
  * logical_AND_ops - executes && commands
  * @lineptr: the arguent from command_line
- * @env: enviromental avriable
- *
+ * @shell: the shell information
  *
  * Return: Always 0 for success
  */
-int logical_op(char *lineptr, char **env)
+int logical_op(char *lineptr, shellInfo *shell)
 {
 	char *command, *token[100], *current_command;
 	char *args[100], *tok;
-	int exit_status = 0, i, j, cmd_count = 0, status, mem = 0;
+	int i, j, status, mem = 0;
 	pid_t chpro;
 
 	/* split by && */
 	command = _strtok(lineptr, "&&");
-	while (command && cmd_count < 100)
+	while (command && shell->cmd_count < 100)
 	{
-		token[cmd_count++] = _strdup(command);
+		token[shell->cmd_count++] = _strdup(command);
 		command = _strtok(NULL, "&&");
 	}
-	token[cmd_count] = NULL;
+	token[shell->cmd_count] = NULL;
 
-	for (i = 0; i < cmd_count; i++)
+	for (i = 0; i < shell->cmd_count; i++)
 	{
 		current_command = token[i];
 		status = 0;
@@ -75,12 +74,12 @@ int logical_op(char *lineptr, char **env)
 			}
 			args[j] = NULL;
 
-			exit_status = pipes_redirection(args, j, env);
+			shell->exit_status = pipes_redirection(args, j, shell);
 
 			/* stop if failed */
-			if (exit_status != 0)
+			if (shell->exit_status != 0)
 			{
-				free_em(token, cmd_count);
+				free_em(token, shell->cmd_count);
 				mem = 1;
 				break;
 			}
@@ -102,22 +101,23 @@ int logical_op(char *lineptr, char **env)
 			continue;
 
 		/* builtin */
-		if (built_cmd(args, env, &exit_status))
+		if (built_cmd(args, shell))
 		{
-			if (exit_status != 0)
+			if (shell->exit_status != 0)
 			{
-				free_em(token, cmd_count);
+				free_em(token, shell->cmd_count);
 				mem = 1;
 				break;
 			}
 			continue;
 		}
 
+
 		/* external command */
 		chpro = fork();
 		if (chpro == 0)
 		{
-			if (get_loc(args[0], args, env) == -1)
+			if (get_loc(args[0], args, shell) == -1)
 				exit(EXIT_FAILURE);
 		}
 		else if (chpro > 0)
@@ -125,11 +125,11 @@ int logical_op(char *lineptr, char **env)
 			wait(&status);
 			if (WIFEXITED(status))
 			{
-				exit_status = wait_status(status);
+				shell->exit_status = wait_status(status);
 
-				if (exit_status != 0)
+				if (shell->exit_status != 0)
 				{
-					free_em(token, cmd_count);
+					free_em(token, shell->cmd_count);
 					mem = 1;
 					break;
 				}
@@ -138,15 +138,15 @@ int logical_op(char *lineptr, char **env)
 		else
 		{
 			perror("fork");
-			free_em(token, cmd_count);
+			free_em(token, shell->cmd_count);
 			return (1);
 		}
 	}
 
 	if (!mem)
-		free_em(token, cmd_count);
+		free_em(token, shell->cmd_count);
 
-	return (exit_status);
+	return (shell->exit_status);
 }
 
 /**
@@ -157,22 +157,22 @@ int logical_op(char *lineptr, char **env)
  *
  * Return: Always 0 for success
  */
-int logical_or(char *lineptr, char **env)
+int logical_or(char *lineptr, shellInfo *shell)
 {
 	char *command, *token[100], *current_command;
 	char *args[100], *tok;
-	int exit_status = 0, i, j, cmd_count = 0, status, mem = 0;
+	int i, j, status, mem = 0;
 	pid_t chpro;
 
 	/* split by || */
 	command = _strtok(lineptr, "||");
-	while (command && cmd_count < 100)
+	while (command && shell->cmd_count < 100)
 	{
-		token[cmd_count++] = _strdup(command);
+		token[shell->cmd_count++] = _strdup(command);
 		command = _strtok(NULL, "||");
 	}
-	token[cmd_count] = NULL;
-	for (i = 0; i < cmd_count; i++)
+	token[shell->cmd_count] = NULL;
+	for (i = 0; i < shell->cmd_count; i++)
 	{
 		current_command = token[i];
 		status = 0;
@@ -189,12 +189,12 @@ int logical_or(char *lineptr, char **env)
 			}
 			args[j] = NULL;
 
-			exit_status = pipes_redirection(args, j, env);
+			shell->exit_status = pipes_redirection(args, j, shell);
 
 			/* stop if failed */
-			if (exit_status == 0)
+			if (shell->exit_status == 0)
 			{
-				free_em(token, cmd_count);
+				free_em(token, shell->cmd_count);
 				mem = 1;
 				break;
 			}
@@ -216,11 +216,11 @@ int logical_or(char *lineptr, char **env)
 			continue;
 
 		/* builtin */
-		if (built_cmd(args, env, &exit_status))
+		if (built_cmd(args, shell))
 		{
-			if (exit_status == 0)
+			if (shell->exit_status == 0)
 			{
-				free_em(token, cmd_count);
+				free_em(token, shell->cmd_count);
 				mem = 1;
 				break;
 			}
@@ -229,7 +229,7 @@ int logical_or(char *lineptr, char **env)
 		chpro = fork();
 		if (chpro == 0)
 		{
-			if (get_loc(args[0], args, env) == -1)
+			if (get_loc(args[0], args, shell) == -1)
 				exit(EXIT_FAILURE);
 		}
 		else if (chpro > 0)
@@ -237,11 +237,11 @@ int logical_or(char *lineptr, char **env)
 			wait(&status);
 			if (WIFEXITED(status))
 			{
-				exit_status = wait_status(status);
+				shell->exit_status = wait_status(status);
 
-				if (exit_status == 0)
+				if (shell->exit_status == 0)
 				{
-					free_em(token, cmd_count);
+					free_em(token, shell->cmd_count);
 					mem = 1;
 					break;
 				}
@@ -250,40 +250,40 @@ int logical_or(char *lineptr, char **env)
 		else
 		{
 			perror("fork");
-			free_em(token, cmd_count);
+			free_em(token, shell->cmd_count);
 			return (1);
 		}
 	}
 
 	if (!mem)
-		free_em(token, cmd_count);
+		free_em(token, shell->cmd_count);
 
-	return (exit_status);
+	return (shell->exit_status);
 }
 
 /**
  * logical_co - executes ; commands
  * @lineptr: the argument from command_line
-	 * @env: env variable
+ * @shell: struct enviromental variable
  * Return: Always 0 for success
  */
-int logical_co(char *lineptr, char **env)
+int logical_co(char *lineptr, shellInfo *shell)
 {
 	char *command, *token[100], *current_command;
 	char *args[100], *tok;
-	int exit_status = 0, i, j, cmd_count = 0, status, mem = 0;
+	int i, j, status, mem = 0;
 	pid_t chpro;
 
 	/* split by ; */
 	command = _strtok(lineptr, ";");
-	while (command && cmd_count < 100)
+	while (command && shell->cmd_count < 100)
 	{
-		token[cmd_count++] = _strdup(command);
+		token[shell->cmd_count++] = _strdup(command);
 		command = _strtok(NULL, ";");
 	}
-	token[cmd_count] = NULL;
+	token[shell->cmd_count] = NULL;
 
-	for (i = 0; i < cmd_count; i++)
+	for (i = 0; i < shell->cmd_count; i++)
 	{
 		current_command = token[i];
 		status = 0;
@@ -303,7 +303,7 @@ int logical_co(char *lineptr, char **env)
 			}
 			args[j] = NULL;
 
-			exit_status = pipes_redirection(args, j, env);
+			shell->exit_status = pipes_redirection(args, j, shell);
 
 			/* stop if failed */
 			continue;
@@ -324,7 +324,7 @@ int logical_co(char *lineptr, char **env)
 			continue;
 
 		/* builtin */
-		if (built_cmd(args, env, &exit_status))
+		if (built_cmd(args, shell))
 		{
 			continue;
 		}
@@ -333,7 +333,7 @@ int logical_co(char *lineptr, char **env)
 		chpro = fork();
 		if (chpro == 0)
 		{
-			if (get_loc(args[0], args, env) == -1)
+			if (get_loc(args[0], args, shell) == -1)
 				exit(EXIT_FAILURE);
 		}
 		else if (chpro > 0)
@@ -341,22 +341,22 @@ int logical_co(char *lineptr, char **env)
 			wait(&status);
 			if (WIFEXITED(status))
 			{
-				exit_status = wait_status(status);
+				shell->exit_status = wait_status(status);
 
 			}
 		}
 		else
 		{
 			perror("fork");
-			free_em(token, cmd_count);
+			free_em(token, shell->cmd_count);
 			return (1);
 		}
 	}
 
 	if (!mem)
-		free_em(token, cmd_count);
+		free_em(token, shell->cmd_count);
 
-	return (exit_status);
+	return (shell->exit_status);
 }
 
 /**

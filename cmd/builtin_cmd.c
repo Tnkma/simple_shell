@@ -10,38 +10,38 @@
  * Return: Always 0 for success
  */
 
-int built_cmd(char **args, char **envp, int *status_for_exit)
+int built_cmd(char **args, shellInfo *shell)
 {
     char *command = args[0];
 
-    if (_getppid(args, status_for_exit))
+    if (_getppid(args, shell))
         return (1);
 
     if (_strcmp(command, "cd") == 0)
     {
-        *status_for_exit = change_directory(args);
+        shell->exit_status = change_directory(args);
         return (1);
     }
     else if (_strcmp(command, "setenv") == 0)
     {
-        *status_for_exit = set_env_var(args);
+        shell->exit_status = set_env_var(args);
         return (1);
     }
     else if (_strcmp(command, "unsetenv") == 0)
     {
-        *status_for_exit = unset_env_var(args);
+        shell->exit_status = unset_env_var(args);
         return (1);
     }
     else if (_strcmp(command, "env") == 0)
     {
-        _env(envp);
-        *status_for_exit = 0;
+        _env(shell);
+        shell->exit_status = 0;
         return (1);
     }
     else if (_strcmp(command, "exit") == 0)
     {
         d_exit(args);
     }
-    return (*status_for_exit);
+    return (shell->exit_status);
 }
 

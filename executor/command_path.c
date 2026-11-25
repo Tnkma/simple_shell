@@ -10,7 +10,7 @@
  * Return: Always 0 for sucess
  */
 
-char *loc(char *path, char *arg, char **args, char **env)
+char *loc(char *path, char *arg, char **args, shellInfo *shell)
 {
 	char *path_copy, *path_token, *file;
 	char *delima = ":";
@@ -33,7 +33,7 @@ char *loc(char *path, char *arg, char **args, char **env)
 		_strcat(file, "\0");
 		if (access(file, X_OK) == 0)
 		{
-			execve(file, args, env);
+			execve(file, args, shell->envp);
 			perror("execve");
 			free(path_copy);
 			free(file);
@@ -54,13 +54,13 @@ char *loc(char *path, char *arg, char **args, char **env)
  * Return: void since were void
  */
 
-int get_loc(char *arg, char **args, char **env)
+int get_loc(char *arg, char **args, shellInfo *shell)
 {
 	char *p_aths;
 
 	if (access(arg, X_OK) == 0)
 	{
-		if (execve(arg, args, env) == -1)
+		if (execve(arg, args, shell->envp) == -1)
 		{
 			return (2);
 		}
@@ -76,7 +76,7 @@ int get_loc(char *arg, char **args, char **env)
 		p_aths = getenv("PATH");
 		if (p_aths)
 		{
-			loc(p_aths, arg, args, env);
+			loc(p_aths, arg, args, shell);
 			perror("command not found");
 			return (-1);
 		}
